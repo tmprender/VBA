@@ -1,0 +1,56 @@
+Sub SeparateCSVintoRecord()
+ 
+Dim dbsTracker As DAO.Database
+Dim rstIN As DAO.Recordset
+Dim rstOUT As DAO.Recordset
+
+Dim strSQL As String
+Dim outSQL As String 
+ 
+On Error GoTo ErrorHandler
+ 
+    Set dbsTracker = CurrentDb
+   
+    ' Open a table to read from
+    strSQL = "SELECT * FROM table1’”
+    Set rstCAPS = dbsTracker.OpenRecordset(strSQL, dbOpenDynaset)
+   
+    ' Open template table to write to.. build table2 before running
+    outSQL = "SELECT * FROM table2”
+    Set rstOUT = dbsTracker.OpenRecordset(outSQL, dbOpenDynaset)
+ 
+    If rstCAPS.EOF Then Exit Sub
+   
+    ' loop thru table1 and pull out each CSV from field_table1
+    With rstIN
+        Do Until .EOF
+        csv_arr = Split(rstCAPS![field_table1], ",")
+       
+        ' put ID and CSV into new table rstOUT
+        For Each Item In csv_arr
+            Item = Replace(Item, " ", "")
+            Debug.Print Item
+       
+            rstOUT.AddNew
+            rstOUT![ID] = rstIN![ID]
+            rstOUT![field_table2] = Item
+            rstOUT.Update
+            rstOUT.Bookmark = rstOUT.LastModified
+        Next
+        .MoveNext
+        Loop
+    End With
+   
+    rstIN.Close
+    rstOUT.Close
+    dbsTracker.Close
+   
+    Set rstIN = Nothing
+    Set rstOUT = Nothing
+    Set dbsTracker = Nothing
+   
+    Exit Sub
+   
+ErrorHandler:
+    MsgBox "Error #: " & Err.Number & vbCrLf & vbCrLf & Err.Description
+End Sub

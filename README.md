@@ -1,16 +1,16 @@
-README
+# README
 
 Run in MS Access. Must have a blank template table created for script to write to. 
 
 
-Before:
+## Before:
 
 ID	CSV_FILED
 1 	aaa, bb, c
 2	zz,yy
 3	x
 
-After
+## After:
 
 ID	VALUE
 1	aaa
